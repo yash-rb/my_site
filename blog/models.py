@@ -29,6 +29,8 @@ class Post(models.Model):
     allow us to access related objects easily from a user object by using the user.blog_posts notation. """
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
     
+    
+    #Objects Manager
     objects = models.Manager() #default manager
     published = PublishedManager() #Custom object manager
 
