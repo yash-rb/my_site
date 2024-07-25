@@ -2,6 +2,14 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+
+#Custom object manager
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()\
+            .filter(status=Post.Status.PUBLISHED)
+
+#Post Model 
 class Post(models.Model):
     
     class Status(models.TextChoices):
@@ -20,6 +28,9 @@ class Post(models.Model):
     """We use related_name to specify the name of the reverse relationship, from User to Post. This will
     allow us to access related objects easily from a user object by using the user.blog_posts notation. """
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
+    
+    objects = models.Manager() #default manager
+    published = PublishedManager() #Custom object manager
 
     class Meta:
         # This ordering will apply by default for database queries when no specific order is provided in the query |   ##(-)hyphen indicates descending order before the field name, -publish.
