@@ -35,6 +35,28 @@ class PostListView(ListView):
     context_object_name = 'posts'
     template_name = 'blog/post/list.html'
     
+     #Adding Error handling in List view
+    def get(self, request, *args, **kwargs):
+        paginator = Paginator(self.queryset, self.paginate_by)
+
+        page_number = request.GET.get('page', 1)
+        try:
+            page_obj = paginator.page(page_number)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver the first page.
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            # If the page is out of range, deliver the last page of results.
+            page_obj = paginator.page(paginator.num_pages)
+
+        context = {
+            'posts':page_obj.object_list,
+            'page_obj': page_obj,
+            'paginator': paginator,
+            'is_paginated': paginator.num_pages > 1,}
+        
+        return render(request, self.template_name, context)
+    
    
 
 def post_detail(request, year, month, day, post):
