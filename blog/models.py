@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
-
+from taggit.managers import TaggableManager
 
 #Custom object manager
 class PublishedManager(models.Manager):
@@ -34,6 +34,8 @@ class Post(models.Model):
     #Objects Manager
     objects = models.Manager() #default manager
     published = PublishedManager() #Custom object manager
+    
+    tags=TaggableManager()
 
     class Meta:
         # This ordering will apply by default for database queries when no specific order is provided in the query |   ##(-)hyphen indicates descending order before the field name, -publish.
@@ -54,4 +56,22 @@ class Post(models.Model):
                            self.publish.day,
                            self.slug
                        ] )
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+    
+    
+    class Meta:
+        ordering = ['created']
+        indexes = [
+            models.Index(fields=['created']),
+        ]
+    def __str__(self):
+        return f"Comment by {self.name} on {self.post}"
     
